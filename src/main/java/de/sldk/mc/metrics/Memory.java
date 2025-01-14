@@ -5,21 +5,24 @@ import org.bukkit.plugin.Plugin;
 
 public class Memory extends Metric {
 
-    private static final Gauge MEMORY = Gauge.build()
+    private static final Gauge MEMORY_USED_PERCENT = Gauge.build()
             .name(prefix("jvm_memory"))
-            .help("JVM memory usage")
-            .labelNames("type")
+            .help("JVM used memory in percentage")
             .create();
 
     public Memory(Plugin plugin) {
-        super(plugin, MEMORY);
+        super(plugin, MEMORY_USED_PERCENT);
     }
 
     @Override
     public void doCollect() {
-        MEMORY.labels("max").set(Runtime.getRuntime().maxMemory());
-        MEMORY.labels("free").set(Runtime.getRuntime().freeMemory());
-        MEMORY.labels("allocated").set(Runtime.getRuntime().totalMemory());
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+
+        double usedMemoryPercent = ((double) usedMemory / maxMemory) * 100.0;
+        MEMORY_USED_PERCENT.set(usedMemoryPercent);
     }
 
     @Override

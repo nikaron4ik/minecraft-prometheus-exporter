@@ -10,21 +10,23 @@ public class TickDurationAverageCollector extends Metric {
 
     private static final Gauge TD = Gauge.build()
             .name(Metric.prefix(NAME))
-            .help("Average duration of server tick (nanoseconds)")
+            .help("Average duration of server tick (milliseconds)")
             .create();
 
     public TickDurationAverageCollector(Plugin plugin) {
         super(plugin, TD);
     }
 
-    private long getTickDurationAverage() {
+    private double getTickDurationAverage() {
         long sum = 0;
         long[] durations = collector.getTickDurations();
-        for (Long val : durations) {
+        for (long val : durations) {
             sum += val;
         }
-        return sum / durations.length;
+        double averageInNanoSeconds = (double) sum / durations.length;
+        return averageInNanoSeconds * 1e-6; // Конвертация из наносекунд в миллисекунды
     }
+
 
     @Override
     public void doCollect() {

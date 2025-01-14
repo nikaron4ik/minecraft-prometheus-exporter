@@ -25,6 +25,12 @@ public class PrometheusExporterConfig {
             metricConfig("tps", true, Tps::new),
             metricConfig("world_size", true, WorldSize::new),
 
+            // Дополнительно добавленные метрики
+            metricConfig("uptime", true, Uptime::new),
+            metricConfig("cpu_usage", true, CpuUsage::new),
+            metricConfig("active_threads", true, ActiveThreads::new),
+            //
+
             metricConfig("jvm_threads", true, ThreadsWrapper::new),
             metricConfig("jvm_gc", true, GarbageCollectorWrapper::new),
 
