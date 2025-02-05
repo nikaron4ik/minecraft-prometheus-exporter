@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -46,18 +47,26 @@ public class Entities extends WorldMetric {
 
     @Override
     public void collect(World world) {
-        Map<EntityType, Long> mapEntityTypesToCounts = world.getEntities().stream()
-                .collect(Collectors.groupingBy(Entity::getType, Collectors.counting()));
+        Map<EntityType, Long> mapEntityTypesToCounts = new HashMap<>();
 
-        mapEntityTypesToCounts
-                .forEach((entityType, count) ->
-                        ENTITIES
-                                .labels(world.getName(),
-                                        getEntityName(entityType),
-                                        Boolean.toString(isEntityTypeAlive(entityType)),
-                                        Boolean.toString(entityType.isSpawnable()))
-                                .set(count)
-                );
+        // Цикл для подсчёта всех мобов на сервере
+        for (Entity entity : world.getEntities() ) {
+            EntityType type = entity.getType();
+            mapEntityTypesToCounts.put(type, mapEntityTypesToCounts.getOrDefault(type, 0L) + 1);
+        }
+
+        // Цикл для сбора метрики по каждому подсчитанному мобу
+        for (Map.Entry<EntityType, Long> entry : mapEntityTypesToCounts.entrySet()) {
+            EntityType entityType = entry.getKey();
+            long count = entry.getValue();
+
+            ENTITIES
+                    .labels(world.getName(),
+                            getEntityName(entityType),
+                            Boolean.toString(isEntityTypeAlive(entityType)),
+                            Boolean.toString(entityType.isSpawnable()))
+                    .set(count);
+        }
     }
 
     private boolean isEntityTypeAlive(EntityType type) {
