@@ -8,13 +8,13 @@ import java.lang.management.OperatingSystemMXBean;
 
 public class CpuUsageOS_100 extends Metric {
 
-    private static final Gauge CPU_USAGE_OS = Gauge.build()
+    private static final Gauge CPU_USAGE_OS_100 = Gauge.build()
             .name(prefix("cpu_usage_os_100"))
             .help("CPU usage of OS percentage")
             .create();
 
     public CpuUsageOS_100(Plugin plugin) {
-        super(plugin, CPU_USAGE_OS);
+        super(plugin, CPU_USAGE_OS_100);
     }
 
     private double getCpuUsage() {
@@ -29,6 +29,6 @@ public class CpuUsageOS_100 extends Metric {
 
     @Override
     protected void doCollect() {
-        CPU_USAGE_OS.set(getCpuUsage());
+        CPU_USAGE_OS_100.set(getCpuUsage());
     }
 }
