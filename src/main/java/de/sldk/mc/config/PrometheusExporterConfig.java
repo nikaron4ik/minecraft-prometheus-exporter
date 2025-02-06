@@ -27,7 +27,7 @@ public class PrometheusExporterConfig {
 
             // Дополнительно добавленные метрики
             metricConfig("uptime", true, Uptime::new),
-            metricConfig("cpu_usage_os", true, CpuUsageOS::new),
+            metricConfig("cpu_usage_os", true, CpuUsageOS_100::new),
             metricConfig("cpu_usage_process", true, CpuUsageProcess::new),
             metricConfig("active_threads", true, ActiveThreads::new),
             //

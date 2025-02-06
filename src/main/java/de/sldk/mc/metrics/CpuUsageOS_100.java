@@ -6,14 +6,14 @@ import org.bukkit.plugin.Plugin;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 
-public class CpuUsageOS extends Metric {
+public class CpuUsageOS_100 extends Metric {
 
     private static final Gauge CPU_USAGE_OS = Gauge.build()
-            .name(prefix("cpu_usage_os"))
+            .name(prefix("cpu_usage_os_100"))
             .help("CPU usage of OS percentage")
             .create();
 
-    public CpuUsageOS(Plugin plugin) {
+    public CpuUsageOS_100(Plugin plugin) {
         super(plugin, CPU_USAGE_OS);
     }
 
