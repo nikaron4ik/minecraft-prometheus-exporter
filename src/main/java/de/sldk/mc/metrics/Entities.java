@@ -1,6 +1,7 @@
 package de.sldk.mc.metrics;
 
 import io.prometheus.client.Gauge;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -8,7 +9,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonMap;
 
@@ -50,7 +50,12 @@ public class Entities extends WorldMetric {
         Map<EntityType, Long> mapEntityTypesToCounts = new HashMap<>();
 
         // Цикл для подсчёта всех мобов на сервере
+        Location location;
         for (Entity entity : world.getEntities() ) {
+            location = entity.getLocation();
+            // По неизвестной причине некоторые рамки и вагонетки из выгруженных чанков у нас возвращаются ядром,
+            // при этом isValid() для них true
+            if (!world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) continue;
             EntityType type = entity.getType();
             mapEntityTypesToCounts.put(type, mapEntityTypesToCounts.getOrDefault(type, 0L) + 1);
         }
