@@ -6,22 +6,27 @@ import org.bukkit.plugin.Plugin;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 
-public class CpuUsage extends Metric {
+public class CpuUsageProcess extends Metric {
 
-    private static final Gauge CPU_USAGE = Gauge.build()
-            .name(prefix("cpu_usage"))
-            .help("CPU usage percentage")
+    private static final Gauge CPU_USAGE_PROCESS = Gauge.build()
+            .name(prefix("cpu_usage_process"))
+            .help("CPU usage of process percentage (by number of cores)")
             .create();
 
-    public CpuUsage(Plugin plugin) {
-        super(plugin, CPU_USAGE);
+    public CpuUsageProcess(Plugin plugin) {
+        super(plugin, CPU_USAGE_PROCESS);
     }
 
     private double getCpuUsage() {
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
             com.sun.management.OperatingSystemMXBean sunOsBean = (com.sun.management.OperatingSystemMXBean) osBean;
-            return sunOsBean.getSystemCpuLoad() * 100;
+
+            double CpuLoad = sunOsBean.getProcessCpuLoad();
+
+            int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+            return CpuLoad * 100 * availableProcessors;
         } else {
             return 0.0;
         }
@@ -29,6 +34,8 @@ public class CpuUsage extends Metric {
 
     @Override
     protected void doCollect() {
-        CPU_USAGE.set(getCpuUsage());
+        CPU_USAGE_PROCESS.set(getCpuUsage());
     }
+
+
 }
