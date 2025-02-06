@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.prometheus.client.CollectorRegistry;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -62,6 +63,7 @@ class EntitiesTest {
 		World world = mock(World.class);
 		when(world.getName()).thenReturn(worldName);
 		when(world.getEntities()).thenReturn(mockedEntities);
+		when(world.isChunkLoaded(0, 0)).thenReturn(true);
 
 		entitiesMetric.collect(world);
 
@@ -121,6 +123,7 @@ class EntitiesTest {
 	private Entity mockEntity(EntityType type) {
 		Entity e = mock(Entity.class);
 		when(e.getType()).thenReturn(type);
+		when(e.getLocation()).thenReturn(new Location(null, 0, 0,0 ));
 		return e;
 	}
 }
