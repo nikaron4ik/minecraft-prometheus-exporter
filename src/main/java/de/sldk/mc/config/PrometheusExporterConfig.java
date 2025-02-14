@@ -33,6 +33,7 @@ public class PrometheusExporterConfig {
             metricConfig("cpu_usage_process_100", true, CpuUsageProcess_100::new),
             metricConfig("active_threads", true, ActiveThreads::new),
             metricConfig("network_bytes", true, NetworkTrafficProcess::new),
+            metricConfig("console_errors", true, ConsoleErrors::new),
             //
 
             metricConfig("jvm_threads", true, ThreadsWrapper::new),
