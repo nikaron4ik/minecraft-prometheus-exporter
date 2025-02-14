@@ -2,12 +2,10 @@ package de.sldk.mc.metrics;
 
 import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
-import oshi.SystemInfo;
-import oshi.software.os.OSProcess;
-import oshi.software.os.OperatingSystem;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class NetworkTrafficProcess extends Metric {
 
@@ -17,59 +15,45 @@ public class NetworkTrafficProcess extends Metric {
             .labelNames("type")
             .create();
 
-
-    private final SystemInfo systemInfo = new SystemInfo();
-    private final int processId;
-
-    private long previousBytesSent = 0;
-    private long previousBytesReceived = 0;
-    private long lastUpdateTime = System.currentTimeMillis();
+    private static final String interfaceName = "eth0"; // имя сетевого интерфейса
 
     public NetworkTrafficProcess(Plugin plugin) {
         super(plugin, NETWORK_BYTES);
-        this.processId = getCurrentProcessId();
     }
 
-    private int getCurrentProcessId() {
-        RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
-        String processName = runtimeBean.getName();
-        return Integer.parseInt(processName.split("@")[0]);
-    }
-
-    private long[] getNetworkTraffic() {
-        OperatingSystem os = systemInfo.getOperatingSystem();
-        OSProcess process = os.getProcess(processId);
-
-        if (process != null) {
-            long bytesSent = process.getBytesWritten();
-            long bytesReceived = process.getBytesRead();
-            return new long[]{bytesSent, bytesReceived};
-        } else {
-            return new long[]{0, 0};
+    private long[] getNetworkTrafficFromProcess() {
+        long[] traffic = new long[]{0, 0};
+        try (BufferedReader reader = new BufferedReader(new FileReader("/proc/net/dev"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().startsWith(interfaceName + ":")) {
+                    String[] parts = line.trim().split("\\s+");
+                    if (parts.length > 9) {
+                        try {
+                            traffic[0] = Long.parseLong(parts[1]); // Received bytes
+                            traffic[1] = Long.parseLong(parts[9]); // Sent bytes
+                            break;
+                        } catch (NumberFormatException e) {
+                            getPlugin().getLogger().warning("Неверный формат числа в /proc/net/dev: " + e.getMessage());
+                        }
+                    } else {
+                        getPlugin().getLogger().warning("Некорректный формат строки интерфейса: " + line);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            getPlugin().getLogger().warning("Ошибка при парсинге /proc/net/dev: " + e.getMessage());
         }
+        return traffic;
     }
 
     @Override
     protected void doCollect() {
-        long[] traffic = getNetworkTraffic();
-        long currentBytesSent = traffic[0];
-        long currentBytesReceived = traffic[1];
+        long[] traffic = getNetworkTrafficFromProcess();
+        long receivedBytes = traffic[0];
+        long sentBytes = traffic[1];
 
-        long currentTime = System.currentTimeMillis();
-        long timeDifference = (currentTime - lastUpdateTime) / 1000;
-        if (timeDifference == 0) {
-            return;
-        }
-
-        double bytesSentPerSecond = ((double)(currentBytesSent - previousBytesSent) / timeDifference) * 8 / 1024 / 1024;
-        double bytesReceivedPerSecond = ((double)(currentBytesReceived - previousBytesReceived) / timeDifference) * 8 / 1024 / 1024;
-
-        NETWORK_BYTES.labels("sent").set(bytesSentPerSecond);
-        NETWORK_BYTES.labels("received").set(bytesReceivedPerSecond);
-
-        previousBytesSent = currentBytesSent;
-        previousBytesReceived = currentBytesReceived;
-        lastUpdateTime = currentTime;
+        NETWORK_BYTES.labels("received").set(receivedBytes);
+        NETWORK_BYTES.labels("sent").set(sentBytes);
     }
-
 }
