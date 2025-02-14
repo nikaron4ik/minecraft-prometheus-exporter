@@ -56,4 +56,14 @@ public class NetworkTrafficProcess extends Metric {
         NETWORK_BYTES.labels("received").set(receivedBytes);
         NETWORK_BYTES.labels("sent").set(sentBytes);
     }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
+    }
+
+    @Override
+    public boolean isAsyncCapable() {
+        return true;
+    }
 }

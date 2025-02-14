@@ -33,4 +33,14 @@ public class CpuUsageProcess_100 extends Metric {
         CPU_USAGE_PROCESS_100.set(getCpuUsage());
     }
 
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
+    }
+
+    @Override
+    public boolean isAsyncCapable() {
+        return true;
+    }
+
 }

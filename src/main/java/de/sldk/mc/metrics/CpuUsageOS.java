@@ -37,4 +37,14 @@ public class CpuUsageOS extends Metric {
     protected void doCollect() {
         CPU_USAGE_OS.set(getCpuUsage());
     }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
+    }
+
+    @Override
+    public boolean isAsyncCapable() {
+        return true;
+    }
 }

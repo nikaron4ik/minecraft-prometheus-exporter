@@ -49,4 +49,14 @@ public class ConsoleErrors extends Metric {
     protected void doCollect() {
         ERROR_COUNTER.set(errorCounter.getAndSet(0));  //Для сбора ошибок с момента запуска сервера - .get(), для обновления при каждом сборе метрики -   .getAndSet(0)
     }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
+    }
+
+    @Override
+    public boolean isAsyncCapable() {
+        return true;
+    }
 }
