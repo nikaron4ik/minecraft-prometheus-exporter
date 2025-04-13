@@ -1,8 +1,21 @@
-*.iml
-/.idea/
+#Project exclude paths
+/prometheusexporter-core/target/
+/prometheusexporter-api/target/
 /target/
+
+#intellij
+*.iml
+*.ipr
+*.iws
+/.idea/
+
+# Eclipse stuff
 .settings
 .classpath
 .project
-.vscode
-/docker/data
+
+# delombok
+*/src/main/lombok
+
+/prometheusexporter-core/.vscode
+/prometheusexporter-core/docker/data

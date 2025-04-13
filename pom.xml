@@ -4,193 +4,37 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.sldk.mc</groupId>
+    <groupId>su.funtime.prometheus</groupId>
     <artifactId>minecraft-prometheus-exporter</artifactId>
-    <version>3.1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>prometheusexporter-api</module>
+        <module>prometheusexporter-core</module>
+    </modules>
 
     <properties>
-        <paper-api.version>1.20.4-R0.1-SNAPSHOT</paper-api.version>
-        <jetty.version>12.0.16</jetty.version>
-        <prometheus-client.version>0.16.0</prometheus-client.version>
-        <json-path.version>2.9.0</json-path.version>
-        <junit.jupiter.version>5.11.4</junit.jupiter.version>
-        <org.mockito.version>5.15.2</org.mockito.version>
-        <assertj.version>3.26.3</assertj.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
-        <maven-jgitflow-plugin.version>1.21.0</maven-jgitflow-plugin.version>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>papermc</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>${paper-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_common</artifactId>
-            <version>${prometheus-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_hotspot</artifactId>
-            <version>${prometheus-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>${json-path.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${org.mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${org.mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.5.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.oshi</groupId>
-            <artifactId>oshi-core</artifactId>
-            <version>6.6.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.java.dev.jna</groupId>
-                    <artifactId>jna</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.java.dev.jna</groupId>
-                    <artifactId>jna-platform</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>${maven-assembly-plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>de.sldk.mc.PrometheusExporter</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>PrometheusExporter</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.amashchenko.maven.plugin</groupId>
-                <artifactId>gitflow-maven-plugin</artifactId>
-                <version>${maven-jgitflow-plugin.version}</version>
-                <configuration>
-                    <allowSnapshots>true</allowSnapshots>
-                    <pushRemote>false</pushRemote>
-                    <gitFlowConfig>
-                        <developmentBranch>master</developmentBranch>
-                        <versionTagPrefix>v</versionTagPrefix>
-                    </gitFlowConfig>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>testCompile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>3.13.0</version>
                 <configuration>
-                    <release>17</release><source>17</source><target>17</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
