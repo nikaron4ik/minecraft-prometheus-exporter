@@ -1,7 +1,7 @@
 name: PrometheusExporter
 version: 3.1.0
 author: sldk
-main: de.sldk.mc.PrometheusExporter
+main: su.funtime.prometheusexporter.PrometheusExporter
 website: https://github.com/sladkoff/minecraft-prometheus-exporter
 api-version: 1.16
 folia-supported: true
