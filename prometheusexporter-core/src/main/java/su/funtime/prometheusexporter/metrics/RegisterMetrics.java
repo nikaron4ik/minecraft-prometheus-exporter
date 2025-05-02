@@ -1,15 +1,20 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Counter;
+
 import io.prometheus.client.Gauge;
+import org.bukkit.plugin.Plugin;
+
+import su.funtime.prometheusexporter.MetricRegistry;
 import su.funtime.prometheusexporter.api.IProjectRegisterMetrics;
+
+import java.util.function.Supplier;
 
 import static su.funtime.prometheusexporter.metrics.Metric.prefix;
 
 public class RegisterMetrics implements IProjectRegisterMetrics {
 
     @Override
-    public Gauge registerGauge(String name, String help) {
+    public Gauge gaugeBuilder(String name, String help) {
 
         return Gauge.build()
                 .name(prefix(name))
@@ -18,11 +23,9 @@ public class RegisterMetrics implements IProjectRegisterMetrics {
     }
 
     @Override
-    public Counter registerCounter(String name, String help) {
-
-        return Counter.build()
-                .name(prefix(name))
-                .help(help)
-                .create();
+    public void collectMetric(Plugin plugin, Gauge gauge, Supplier<Double> supplier, boolean isAsync) {
+        RegisterGaugeMetric metric = new RegisterGaugeMetric(plugin, gauge, supplier, isAsync);
+        metric.enable();
+        MetricRegistry.getInstance().register(metric);
     }
 }

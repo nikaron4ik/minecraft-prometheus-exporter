@@ -4,16 +4,18 @@ import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
-import su.funtime.prometheusexporter.api.IMetric;
 
-public abstract class Metric implements IMetric {
+public abstract class Metric {
 
     private final static String COMMON_PREFIX = "mc_";
 
     private final Plugin plugin;
+    @Getter
     private final Collector collector;
 
     private boolean enabled = false;

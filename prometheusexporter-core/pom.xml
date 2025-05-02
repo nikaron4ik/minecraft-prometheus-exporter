@@ -115,13 +115,6 @@
             <groupId>su.funtime.prometheus</groupId>
             <artifactId>prometheusexporter-api</artifactId>
             <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>su.funtime.prometheus</groupId>
-            <artifactId>prometheusexporter-api</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

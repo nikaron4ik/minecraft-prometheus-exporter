@@ -2,7 +2,6 @@ package su.funtime.prometheusexporter;
 
 import lombok.Getter;
 import su.funtime.prometheusexporter.api.IProjectController;
-import su.funtime.prometheusexporter.api.IProjectMetricRegistry;
 import su.funtime.prometheusexporter.config.PrometheusExporterConfig;
 import su.funtime.prometheusexporter.health.ConcurrentHealthChecks;
 import su.funtime.prometheusexporter.health.HealthChecks;
@@ -24,7 +23,6 @@ public final class PrometheusExporter extends JavaPlugin implements IProjectCont
 
     @Getter
     private RegisterMetrics registerMetrics;
-    private MetricRegistry metricRegistry;
 
 
     @Override
@@ -37,7 +35,6 @@ public final class PrometheusExporter extends JavaPlugin implements IProjectCont
         this.startMetricsServer(healthChecks);
 
         registerMetrics = new RegisterMetrics();
-        metricRegistry = MetricRegistry.getInstance();
 
         PrometheusApi.controller = this;
     }
@@ -67,10 +64,5 @@ public final class PrometheusExporter extends JavaPlugin implements IProjectCont
             this.getLogger().log(Level.WARNING, "Failed to stop metrics server gracefully: " + var2.getMessage());
             this.getLogger().log(Level.FINE, "Failed to stop metrics server gracefully", var2);
         }
-    }
-
-    @Override
-    public IProjectMetricRegistry getMetricRegistry() {
-        return this.metricRegistry;
     }
 }

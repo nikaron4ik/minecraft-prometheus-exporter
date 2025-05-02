@@ -4,5 +4,4 @@ public interface IProjectController {
 
     IProjectRegisterMetrics getRegisterMetrics();
 
-    IProjectMetricRegistry getMetricRegistry();
 }
