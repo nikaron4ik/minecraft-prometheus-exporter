@@ -10,8 +10,10 @@ import org.bukkit.plugin.Plugin;
 public interface IProjectRegisterMetrics {
 
     /**
-     * Создаёт Gauge-метрику без регистрации её значений.
-     * @deprecated Рекомендуется использовать {@link #registerMetric}
+     * Создаёт Gauge-метрику без регистрации её значений.\
+     *
+     * @deprecated Рекомендуется использовать {@link #registerMetric}.
+     * Оставлен для случаев, когда требуется как-либо изменять Gauge после регистрации.
      *
      * @param name Уникальное название метрики
      * @param help Описание назначения метрики
