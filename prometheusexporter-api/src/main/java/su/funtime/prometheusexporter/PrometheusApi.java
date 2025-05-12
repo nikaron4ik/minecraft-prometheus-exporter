@@ -2,7 +2,7 @@ package su.funtime.prometheusexporter;
 
 import lombok.NonNull;
 import su.funtime.prometheusexporter.api.IProjectController;
-import su.funtime.prometheusexporter.api.IProjectRegisterMetrics;
+import su.funtime.prometheusexporter.api.IProjectMetrics;
 
 public class PrometheusApi {
 
@@ -22,7 +22,7 @@ public class PrometheusApi {
     }
 
     @NonNull
-    public static IProjectRegisterMetrics getRegisterMetrics() {
+    public static IProjectMetrics getRegisterMetrics() {
         return controller().getRegisterMetrics();
     }
 

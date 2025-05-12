@@ -7,7 +7,7 @@ import org.bukkit.plugin.Plugin;
 /**
  * Интерфейс для регистрации и сбора метрик через Prometheus
  */
-public interface IProjectRegisterMetrics {
+public interface IProjectMetrics {
 
     /**
      * Создаёт Gauge-метрику без регистрации её значений.
@@ -34,17 +34,24 @@ public interface IProjectRegisterMetrics {
      */
     void collectMetric(Plugin plugin, Gauge gauge, Supplier<Double> supplier, boolean isAsync);
 
-
     /**
-     * Создаёт и сразу регистрирует сбор Gauge-метрики <b>(рекомендуемый метод) </b>
      *
      * @param plugin Плагин, в котором собирается метрика
      * @param name Название метрики (уникальное)
      * @param help Описание метрики
      * @param supplier Поставщик значения (метод), возвращающий актуальное значение метрики при каждом сборе
-     * @param isAsync true для асинхронного сбора метрики, false для синхронного
+     * @param isAsync true для асинхронного сбора метрики, false для синхронного\
+     * @return {@link Gauge}, который сразу собирается и отображается в Prometheus
      */
-    default void registerMetric(Plugin plugin, String name, String help, Supplier<Double> supplier, boolean isAsync) {
-        collectMetric(plugin, gaugeBuilder(name, help), supplier, isAsync);
+    default Gauge registerMetric(Plugin plugin, String name, String help, Supplier<Double> supplier, boolean isAsync) {
+        Gauge gauge = gaugeBuilder(name, help);
+        collectMetric(plugin, gauge, supplier, isAsync);
+        return gauge;
     }
+
+    /**
+     * Снимает регистрацию Gauge-метрики.
+     * @param gauge-метрика, регистрацию которой требуется снять.
+     */
+    void unregisterMetric(Gauge gauge);
 }

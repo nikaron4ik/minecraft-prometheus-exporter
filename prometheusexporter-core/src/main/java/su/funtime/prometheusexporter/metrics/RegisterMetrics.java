@@ -1,17 +1,18 @@
 package su.funtime.prometheusexporter.metrics;
 
 
+import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
 
 import su.funtime.prometheusexporter.MetricRegistry;
-import su.funtime.prometheusexporter.api.IProjectRegisterMetrics;
+import su.funtime.prometheusexporter.api.IProjectMetrics;
 
 import java.util.function.Supplier;
 
 import static su.funtime.prometheusexporter.metrics.Metric.prefix;
 
-public class RegisterMetrics implements IProjectRegisterMetrics {
+public class RegisterMetrics implements IProjectMetrics {
 
     @Override
     public Gauge gaugeBuilder(String name, String help) {
@@ -28,4 +29,10 @@ public class RegisterMetrics implements IProjectRegisterMetrics {
         metric.enable();
         MetricRegistry.getInstance().register(metric);
     }
+
+    @Override
+    public void unregisterMetric(Gauge gauge) {
+        CollectorRegistry.defaultRegistry.unregister(gauge);
+    }
+
 }
