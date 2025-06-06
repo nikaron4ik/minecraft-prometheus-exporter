@@ -5,21 +5,24 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.function.Supplier;
 
-public class RegisterGaugeMetric extends Metric{
+public class RegisterGaugeMetric extends Metric {
 
     private final Supplier<Double> supplier;
-    private final boolean isAsync;
+    private final boolean isAsyncCapable;
 
-    public RegisterGaugeMetric(Plugin plugin, Gauge gauge, Supplier<Double> supplier, boolean isAsync) {
+    public RegisterGaugeMetric(Plugin plugin, Gauge gauge, Supplier<Double> supplier, boolean isAsyncCapable) {
         super(plugin, gauge);
         this.supplier = supplier;
-        this.isAsync = isAsync;
+        this.isAsyncCapable = isAsyncCapable;
     }
-
 
     @Override
     protected void doCollect() {
-        ((Gauge) getCollector()).set(supplier.get());
+        Double val = this.supplier.get();
+        if (val == null) {
+            return; // TODO Убедиться, что график при такой ситуации отображается корректно (должен быть разрыв)
+        }
+        ((Gauge) getCollector()).set(val);
     }
 
     @Override
@@ -29,6 +32,6 @@ public class RegisterGaugeMetric extends Metric{
 
     @Override
     public boolean isAsyncCapable() {
-        return isAsync;
+        return isAsyncCapable;
     }
 }

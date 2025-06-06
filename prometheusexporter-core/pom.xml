@@ -137,7 +137,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>su.funtime.prometheusexporter.PrometheusExporter</mainClass>
+                            <mainClass>su.funtime.prometheusexporter.PrometheusExporterImpl</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

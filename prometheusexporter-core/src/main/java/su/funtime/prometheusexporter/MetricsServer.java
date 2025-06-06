@@ -12,12 +12,12 @@ public class MetricsServer {
 
     private final String host;
     private final int port;
-    private final PrometheusExporter prometheusExporter;
+    private final PrometheusExporterImpl prometheusExporter;
 	private final HealthChecks healthChecks;
 
     private Server server;
 
-    public MetricsServer(String host, int port, PrometheusExporter prometheusExporter, HealthChecks healthChecks) {
+    public MetricsServer(String host, int port, PrometheusExporterImpl prometheusExporter, HealthChecks healthChecks) {
         this.host = host;
         this.port = port;
         this.prometheusExporter = prometheusExporter;

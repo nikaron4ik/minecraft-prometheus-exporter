@@ -1,7 +1,7 @@
 package su.funtime.prometheusexporter.config;
 
 import su.funtime.prometheusexporter.MetricRegistry;
-import su.funtime.prometheusexporter.PrometheusExporter;
+import su.funtime.prometheusexporter.PrometheusExporterImpl;
 import su.funtime.prometheusexporter.metrics.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -47,9 +47,9 @@ public class PrometheusExporterConfig {
             metricConfig("player_online", false, PlayerOnline::new),
             metricConfig("player_statistic", false, PlayerStatistics::new));
 
-    private final PrometheusExporter prometheusExporter;
+    private final PrometheusExporterImpl prometheusExporter;
 
-    public PrometheusExporterConfig(PrometheusExporter prometheusExporter) {
+    public PrometheusExporterConfig(PrometheusExporterImpl prometheusExporter) {
         this.prometheusExporter = prometheusExporter;
     }
 

@@ -1,7 +1,7 @@
 package su.funtime.prometheusexporter;
 
 import lombok.Getter;
-import su.funtime.prometheusexporter.api.IProjectController;
+import su.funtime.prometheusexporter.api.ProjectController;
 import su.funtime.prometheusexporter.config.PrometheusExporterConfig;
 import su.funtime.prometheusexporter.health.ConcurrentHealthChecks;
 import su.funtime.prometheusexporter.health.HealthChecks;
@@ -13,16 +13,16 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.funtime.prometheusexporter.metrics.RegisterMetrics;
+import su.funtime.prometheusexporter.metrics.RegisterMetricsImpl;
 
-public final class PrometheusExporter extends JavaPlugin implements IProjectController {
+public final class PrometheusExporterImpl extends JavaPlugin implements ProjectController {
     @NotNull
     private final PrometheusExporterConfig config = new PrometheusExporterConfig(this);
     @Nullable
     private MetricsServer metricsServer;
 
     @Getter
-    private RegisterMetrics registerMetrics;
+    private RegisterMetricsImpl registerMetrics;
 
 
     @Override
@@ -34,7 +34,7 @@ public final class PrometheusExporter extends JavaPlugin implements IProjectCont
         Objects.requireNonNull(healthChecks);
         this.startMetricsServer(healthChecks);
 
-        registerMetrics = new RegisterMetrics();
+        registerMetrics = new RegisterMetricsImpl();
 
         PrometheusApi.controller = this;
     }

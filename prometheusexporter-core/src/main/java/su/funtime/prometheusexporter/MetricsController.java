@@ -18,13 +18,13 @@ import java.util.logging.Level;
 public class MetricsController extends Handler.Abstract {
 
     private final MetricRegistry metricRegistry = MetricRegistry.getInstance();
-    private final PrometheusExporter exporter;
+    private final PrometheusExporterImpl exporter;
 
-    private MetricsController(PrometheusExporter exporter) {
+    private MetricsController(PrometheusExporterImpl exporter) {
         this.exporter = exporter;
     }
 
-    public static Handler create(final PrometheusExporter exporter) {
+    public static Handler create(final PrometheusExporterImpl exporter) {
         return new MetricsController(exporter);
     }
 

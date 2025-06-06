@@ -2,7 +2,7 @@ package su.funtime.prometheusexporter.exporter;
 
 
 import su.funtime.prometheusexporter.MetricsServer;
-import su.funtime.prometheusexporter.PrometheusExporter;
+import su.funtime.prometheusexporter.PrometheusExporterImpl;
 import su.funtime.prometheusexporter.health.ConcurrentHealthChecks;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PrometheusExporterTest {
 
 	@Mock
-	private PrometheusExporter exporterMock;
+	private PrometheusExporterImpl exporterMock;
 
 	private int metricsServerPort;
 	private MetricsServer metricsServer;

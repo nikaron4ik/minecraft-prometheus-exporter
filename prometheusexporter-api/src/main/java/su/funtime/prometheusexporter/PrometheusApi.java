@@ -1,19 +1,19 @@
 package su.funtime.prometheusexporter;
 
 import lombok.NonNull;
-import su.funtime.prometheusexporter.api.IProjectController;
-import su.funtime.prometheusexporter.api.IProjectMetrics;
+import su.funtime.prometheusexporter.api.ProjectController;
+import su.funtime.prometheusexporter.api.ProjectMetrics;
 
 public class PrometheusApi {
 
-    static IProjectController controller = null;
+    static ProjectController controller = null;
 
     private PrometheusApi() {
         throw new UnsupportedOperationException("This is a utility class and cannot initialize from your code.");
     }
 
     @NonNull
-    private static IProjectController controller() {
+    private static ProjectController controller() {
         if (controller == null) {
             throw new IllegalStateException("API not initialized");
         }
@@ -22,7 +22,7 @@ public class PrometheusApi {
     }
 
     @NonNull
-    public static IProjectMetrics getRegisterMetrics() {
+    public static ProjectMetrics getRegisterMetrics() {
         return controller().getRegisterMetrics();
     }
 
