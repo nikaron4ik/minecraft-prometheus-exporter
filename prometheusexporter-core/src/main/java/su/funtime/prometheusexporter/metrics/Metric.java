@@ -14,19 +14,17 @@ public abstract class Metric {
 
     private final static String COMMON_PREFIX = "mc_";
 
+    @Getter
     private final Plugin plugin;
     @Getter
     private final Collector collector;
 
+    @Getter
     private boolean enabled = false;
 
     protected Metric(Plugin plugin, Collector collector) {
         this.plugin = plugin;
         this.collector = collector;
-    }
-
-    protected Plugin getPlugin() {
-        return plugin;
     }
 
     @Nullable
@@ -101,7 +99,4 @@ public abstract class Metric {
         enabled = false;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
 }

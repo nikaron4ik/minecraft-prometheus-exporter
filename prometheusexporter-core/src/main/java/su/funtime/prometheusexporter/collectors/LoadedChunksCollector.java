@@ -4,9 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import su.funtime.prometheusexporter.MetricRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,4 +56,11 @@ public class LoadedChunksCollector implements Listener {
             return world.getLoadedChunks().length;
         });
     }
+
+    /* Ивент отключения плагина (для снятия регистрации с метрик этого плагина) */
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+        MetricRegistry.getInstance().unregisterAndDisableAllOfPlugin(event.getPlugin());
+    }
+
 }

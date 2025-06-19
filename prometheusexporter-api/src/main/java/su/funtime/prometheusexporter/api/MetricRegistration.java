@@ -3,12 +3,14 @@ package su.funtime.prometheusexporter.api;
 import io.prometheus.client.Gauge;
 
 import java.util.function.Supplier;
+
+import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
 
 /**
  * Интерфейс для регистрации и сбора метрик через Prometheus
  */
-public interface ProjectMetrics {
+public interface MetricRegistration {
     /**
      *
      * @param plugin Плагин, в котором собирается метрика
@@ -18,7 +20,7 @@ public interface ProjectMetrics {
      * @param isAsyncCapable false для сбора в основном потоке сервера, true для сбора через другие потоки (ForkJoinPool)
      * @return {@link Gauge}, который сразу собирается и отображается в Prometheus
      */
-    Gauge registerMetric(Plugin plugin, String name, String help, Supplier<Double> supplier, boolean isAsyncCapable);
+    Gauge registerMetric(Plugin plugin, String name, String help, @NonNull Supplier<Double> supplier, boolean isAsyncCapable);
 
     /**
      *
