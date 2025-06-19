@@ -3,9 +3,9 @@ package su.funtime.prometheusexporter.metrics;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
+import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
 
-import org.jetbrains.annotations.NotNull;
 import su.funtime.prometheusexporter.MetricRegistry;
 import su.funtime.prometheusexporter.api.MetricCollector;
 import su.funtime.prometheusexporter.api.MetricRegistration;
@@ -16,7 +16,7 @@ import static su.funtime.prometheusexporter.metrics.Metric.prefix;
 
 public class RegisterMetricsImpl implements MetricRegistration {
     @Override
-    public Gauge registerMetric(Plugin plugin, String name, String help, @NotNull Supplier<Double> supplier, boolean isAsyncCapable) {
+    public Gauge registerMetric(@NonNull Plugin plugin, @NonNull String name, @NonNull String help, @NonNull Supplier<Double> supplier, boolean isAsyncCapable) {
         Gauge gauge = Gauge.build()
                 .name(prefix(name))
                 .help(help)
@@ -30,7 +30,7 @@ public class RegisterMetricsImpl implements MetricRegistration {
     }
 
     @Override
-    public Gauge registerMetric(MetricCollector collector) {
+    public Gauge registerMetric(@NonNull MetricCollector collector) {
         return this.registerMetric(
                 collector.getPlugin(),
                 collector.getMetricName(),
@@ -41,12 +41,15 @@ public class RegisterMetricsImpl implements MetricRegistration {
     }
 
     @Override
-    public void unregisterMetric(Gauge gauge) {
+    public void unregisterMetric(@NonNull Gauge gauge) {
         Metric metric = MetricRegistry.getInstance().metricByGauge(gauge);
         if (metric != null) {
+            // Разрегистрация и отключения Gauge-сборщика
             metric.disable();
+            // Удаление экземпляра метрики непосредственно из HashMap плагина
             MetricRegistry.getInstance().unregister(metric);
         } else {
+            // В случае отсутствия экземпляра метрики попросту снимается регистрация Gauge-сборщика
             CollectorRegistry.defaultRegistry.unregister(gauge);
         }
 

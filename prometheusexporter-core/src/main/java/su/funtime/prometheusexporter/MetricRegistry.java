@@ -1,9 +1,11 @@
 package su.funtime.prometheusexporter;
 
 import io.prometheus.client.Gauge;
+import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
 import su.funtime.prometheusexporter.metrics.Metric;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,13 +23,13 @@ public class MetricRegistry {
         return INSTANCE;
     }
 
-    public void register(Metric metric) {
+    public void register(@NonNull Metric metric) {
         pluginMetrics.computeIfAbsent(metric.getPlugin(), p -> new ArrayList<>()).add(metric);
     }
 
-    public void unregister(Metric metric) {
+    public void unregister(@NonNull Metric metric) {
         Plugin plugin = metric.getPlugin();
-        List <Metric> metrics = pluginMetrics.get(plugin);
+        List<Metric> metrics = pluginMetrics.get(plugin);
         if (metrics != null) {
             metrics.remove(metric);
             if (metrics.isEmpty()) {
@@ -36,15 +38,17 @@ public class MetricRegistry {
         }
     }
 
-    public void unregisterAndDisableAllOfPlugin(Plugin plugin) {
-        List <Metric> metrics = pluginMetrics.get(plugin);
-        for (Metric metric : metrics) {
-            metric.disable();
+    public void unregisterAndDisableAllOfPlugin(@NonNull Plugin plugin) {
+        List<Metric> metrics = pluginMetrics.get(plugin);
+        if (metrics != null) {
+            for (Metric metric : metrics) {
+                metric.disable();
+            }
+            pluginMetrics.remove(plugin);
         }
-        pluginMetrics.remove(plugin);
     }
 
-    public Metric metricByGauge(Gauge gauge) {
+    public @Nullable Metric metricByGauge(Gauge gauge) {
         return pluginMetrics.values().stream()
                 .flatMap(Collection::stream)
                 .filter(metric -> metric.getCollector() == gauge)
