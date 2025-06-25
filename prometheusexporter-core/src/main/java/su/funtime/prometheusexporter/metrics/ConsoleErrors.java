@@ -1,8 +1,8 @@
 package su.funtime.prometheusexporter.metrics;
 
+import su.funtime.prometheusexporter.api.MetricCollector;
 import su.funtime.prometheusexporter.collectors.ConsoleErrorHandler;
 import su.funtime.prometheusexporter.utils.ErrorStream;
-import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
 
 import java.io.PrintStream;
@@ -11,17 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-public class ConsoleErrors extends Metric {
-
-    private static final Gauge ERROR_COUNTER = Gauge.build()
-            .name(prefix("console_errors"))
-            .help("Total amount of console errors")
-            .create();
+public class ConsoleErrors extends MetricCollector {
 
     private final AtomicInteger errorCounter = new AtomicInteger(0);
 
     public ConsoleErrors(Plugin plugin) {
-        super(plugin, ERROR_COUNTER);
+        super(plugin, "console_errors", "Total amount of console errors", true);
 
         Logger globalLogger = Logger.getLogger("");
 
@@ -44,17 +39,9 @@ public class ConsoleErrors extends Metric {
         }
 
     @Override
-    protected void doCollect() {
-        ERROR_COUNTER.set(errorCounter.getAndSet(0));  //Для сбора ошибок с момента запуска сервера - .get(), для обновления при каждом сборе метрики -   .getAndSet(0)
-    }
+    public double collect() {
+        //Для сбора ошибок с момента запуска сервера - .get(), для обновления при каждом сборе метрики - .getAndSet(0)
+        return errorCounter.getAndSet(0);
 
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
-
-    @Override
-    public boolean isAsyncCapable() {
-        return true;
     }
 }

@@ -1,44 +1,47 @@
 package su.funtime.prometheusexporter.metrics;
 
+import org.bukkit.Bukkit;
+import su.funtime.prometheusexporter.api.MetricCollector;
 import su.funtime.prometheusexporter.collectors.LoadedChunksCollector;
-import io.prometheus.client.Gauge;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
-public class LoadedChunks extends WorldMetric {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    private static final Gauge LOADED_CHUNKS = Gauge.build()
-            .name(prefix("loaded_chunks_total"))
-            .help("Chunks loaded per world")
-            .labelNames("world")
-            .create();
+public class LoadedChunks extends MetricCollector {
 
     private final LoadedChunksCollector loadedChunksCollector = new LoadedChunksCollector();
 
     public LoadedChunks(Plugin plugin) {
-        super(plugin, LOADED_CHUNKS);
+        super(plugin, "loaded_chunks_total", "Chunks loaded per world", false );
     }
 
     @Override
-    public void enable() {
-        super.enable();
+    public List<String> getLabelNames() {
+        return List.of("world");
+    }
+
+    @Override
+    public void onRegister() {
         getPlugin().getServer().getPluginManager().registerEvents(loadedChunksCollector, getPlugin());
     }
 
     @Override
-    public void disable() {
-        super.disable();
+    public void onUnregister() {
         HandlerList.unregisterAll(loadedChunksCollector);
     }
 
     @Override
-    protected void clear() {
-		LOADED_CHUNKS.clear();
-    }
+    public Map<List<String>, Double> collectWithLabels() {
+        Map<List<String>, Double> map = new HashMap<>();
 
-    @Override
-    public void collect(World world) {
-        LOADED_CHUNKS.labels(world.getName()).set(loadedChunksCollector.getLoadedChunkTotal(world.getName()));
+        for (World world : Bukkit.getWorlds()) {
+            map.put(List.of(world.getName()), (double) loadedChunksCollector.getLoadedChunkTotal(world.getName()));
+        }
+
+        return map;
     }
 }

@@ -1,27 +1,19 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
-public class Uptime extends Metric {
+public class Uptime extends MetricCollector {
 
-    private static final Gauge UPTIME = Gauge.build()
-            .name(prefix("uptime"))
-            .help("Server uptime in hours")
-            .create();
     private final long serverStartTime;
 
     public Uptime(Plugin plugin) {
-        super(plugin, UPTIME);
+        super(plugin, "uptime", "Server uptime in hours", true);
         this.serverStartTime = System.currentTimeMillis();
     }
 
-    private double getUptimeInHours() {
+    @Override
+    public double collect() {
         return (System.currentTimeMillis() - serverStartTime) / 1000.0 / 60.0 / 60.0;
-    }
-
-
-    public void doCollect() {
-        UPTIME.set(getUptimeInHours());
     }
 }

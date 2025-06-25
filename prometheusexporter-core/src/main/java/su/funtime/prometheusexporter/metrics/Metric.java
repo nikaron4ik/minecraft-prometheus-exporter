@@ -68,7 +68,7 @@ public abstract class Metric {
      * By default, all Metrics are sync unless this method
      * is overridden.
      */
-    protected boolean isAsyncCapable() {
+    public boolean isAsyncCapable() {
         return false;
     }
 
@@ -95,8 +95,10 @@ public abstract class Metric {
     }
 
     public void disable() {
-        CollectorRegistry.defaultRegistry.unregister(collector);
-        enabled = false;
-    }
+        if (enabled) {
+            CollectorRegistry.defaultRegistry.unregister(collector);
+            enabled = false;
+        }
+    };
 
 }

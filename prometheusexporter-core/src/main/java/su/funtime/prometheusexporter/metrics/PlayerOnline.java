@@ -1,23 +1,38 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
-public class PlayerOnline extends PlayerMetric {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    private static final Gauge PLAYERS_WITH_NAMES = Gauge.build()
-            .name(prefix("player_online"))
-            .help("Online state by player name")
-            .labelNames("name", "uid")
-            .create();
+public class PlayerOnline extends MetricCollector {
+
 
     public PlayerOnline(Plugin plugin) {
-        super(plugin, PLAYERS_WITH_NAMES);
+        super(plugin, "player_online", "Online state by player name", false);
     }
 
     @Override
-    public void collect(OfflinePlayer player) {
-        PLAYERS_WITH_NAMES.labels(getNameOrUid(player), getUid(player)).set(player.isOnline() ? 1 : 0);
+    public List<String> getLabelNames() {
+        return List.of("name", "uid");
+    }
+
+    @Override
+    public Map<List<String>, Double> collectWithLabels() {
+        Map<List<String>, Double> map = new HashMap<>();
+
+        for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+            String uid = player.getUniqueId().toString();
+            String name = player.getName() != null ? player.getName() : player.getUniqueId().toString();
+            double online = player.isOnline() ? 1.0 : 0.0;
+
+            map.put(List.of(name, uid), online);
+        }
+
+        return map;
     }
 }

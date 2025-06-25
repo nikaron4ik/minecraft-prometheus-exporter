@@ -1,32 +1,18 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
-public class PlayersTotal extends Metric {
-
-    private static final Gauge PLAYERS = Gauge.build()
-            .name(prefix("players_total"))
-            .help("Unique players (online + offline)")
-            .create();
+public class PlayersTotal extends MetricCollector {
 
     public PlayersTotal(Plugin plugin) {
-        super(plugin, PLAYERS);
+        super(plugin, "players_total", "Unique players (online + offline)", true);
     }
 
     @Override
-    public void doCollect() {
-        PLAYERS.set(Bukkit.getOfflinePlayers().length);
+    public double collect() {
+        return Bukkit.getOfflinePlayers().length;
     }
 
-    @Override
-    public boolean isAsyncCapable() {
-        return true;
-    }
-
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
 }

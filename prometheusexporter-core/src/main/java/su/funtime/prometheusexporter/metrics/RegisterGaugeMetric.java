@@ -1,8 +1,9 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
+import io.prometheus.client.Gauge;;
 import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
 import java.util.function.Supplier;
 
@@ -24,18 +25,17 @@ public class RegisterGaugeMetric extends Metric {
     protected void doCollect() {
         Double val = this.supplier.get();
         if (val == null) {
-            return; // TODO Убедиться, что график при такой ситуации отображается корректно (должен быть разрыв)
+            return;
         }
         ((Gauge) getCollector()).set(val);
     }
 
     @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
-
-    @Override
     public boolean isAsyncCapable() {
         return isAsyncCapable;
+    }
+
+    public MetricCollector getMetricCollector() {
+        return supplier instanceof MetricCollector ? (MetricCollector) supplier : null;
     }
 }

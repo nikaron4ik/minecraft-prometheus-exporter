@@ -1,23 +1,18 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
-public class WhitelistedPlayers extends Metric {
-
-    private static final Gauge PLAYERS = Gauge.build()
-            .name(prefix("whitelisted_players"))
-            .help("players count on the white list")
-            .create();
+public class WhitelistedPlayers extends MetricCollector {
 
     public WhitelistedPlayers(Plugin plugin) {
-        super(plugin, PLAYERS);
+        super(plugin, "whitelisted_players", "Players count on the white list", false);
     }
 
     @Override
-    public void doCollect() {
-        PLAYERS.set(Bukkit.getWhitelistedPlayers().size());
+    public double collect() {
+        return Bukkit.getWhitelistedPlayers().size();
     }
 
 }

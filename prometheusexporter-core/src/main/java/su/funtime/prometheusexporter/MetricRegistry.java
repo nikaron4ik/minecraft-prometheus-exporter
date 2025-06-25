@@ -1,9 +1,11 @@
 package su.funtime.prometheusexporter;
 
-import io.prometheus.client.Gauge;
 import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 import su.funtime.prometheusexporter.metrics.Metric;
+import su.funtime.prometheusexporter.metrics.RegisterGaugeLabeledMetric;
+import su.funtime.prometheusexporter.metrics.RegisterGaugeMetric;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -48,11 +50,22 @@ public class MetricRegistry {
         }
     }
 
-    public @Nullable Metric metricByGauge(Gauge gauge) {
-        return pluginMetrics.values().stream()
-                .flatMap(Collection::stream)
-                .filter(metric -> metric.getCollector() == gauge)
-                .findFirst().orElse(null);
+    public @Nullable Metric metricByCollector(@NonNull MetricCollector collector) {
+        List<Metric> metrics = pluginMetrics.get(collector.getPlugin());
+        if (metrics == null) return null;
+
+        return metrics.stream()
+                .filter(metric -> {
+                    if (metric instanceof RegisterGaugeMetric gm) {
+                        return gm.getMetricCollector() == collector;
+                    }
+                    else if (metric instanceof RegisterGaugeLabeledMetric glm) {
+                        return glm.getMetricCollector() == collector;
+                    }
+                    return false;
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     CompletableFuture<Void> collectMetrics() {
@@ -63,5 +76,14 @@ public class MetricRegistry {
                 .filter(Objects::nonNull)
                 .toArray(CompletableFuture[]::new));
     }
+
+    /* Возможно, когда-то пригодится
+    public @Nullable Metric metricByGauge(Gauge gauge) {
+        return pluginMetrics.values().stream()
+                .flatMap(Collection::stream)
+                .filter(metric -> metric.getCollector() == gauge)
+                .findFirst().orElse(null);
+    }
+     */
 
 }

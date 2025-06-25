@@ -1,7 +1,8 @@
 package su.funtime.prometheusexporter.config;
 
-import su.funtime.prometheusexporter.MetricRegistry;
 import su.funtime.prometheusexporter.PrometheusExporterImpl;
+import su.funtime.prometheusexporter.api.MetricCollector;
+import su.funtime.prometheusexporter.api.MetricRegistration;
 import su.funtime.prometheusexporter.metrics.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -36,8 +37,10 @@ public class PrometheusExporterConfig {
             metricConfig("console_errors", true, ConsoleErrors::new),
             //
 
+            /* Отключены за ненадобностью, ни разу не использовались
             metricConfig("jvm_threads", true, ThreadsWrapper::new),
             metricConfig("jvm_gc", true, GarbageCollectorWrapper::new),
+             */
 
             metricConfig("tick_duration_median", true, TickDurationMedianCollector::new),
             metricConfig("tick_duration_average", true, TickDurationAverageCollector::new),
@@ -53,7 +56,7 @@ public class PrometheusExporterConfig {
         this.prometheusExporter = prometheusExporter;
     }
 
-    private static MetricConfig metricConfig(String key, boolean defaultValue, Function<Plugin, Metric> metricInitializer) {
+    private static MetricConfig metricConfig(String key, boolean defaultValue, Function<Plugin, MetricCollector> metricInitializer) {
         return new MetricConfig(key, defaultValue, metricInitializer);
     }
 
@@ -70,31 +73,24 @@ public class PrometheusExporterConfig {
     }
 
     public void enableConfiguredMetrics() {
-        PrometheusExporterConfig.METRICS
-                .forEach(metricConfig -> {
-                    Metric metric = metricConfig.getMetric(prometheusExporter);
-                    String metricName = metric.getClass().getSimpleName();
-                    try {
-                        Boolean enabled = get(metricConfig);
+        MetricRegistration api = prometheusExporter.getRegisterMetrics();
 
-                        var foliaSupported = metric.isFoliaCapable();
+        PrometheusExporterConfig.METRICS.forEach(metricConfig -> {
+            MetricCollector collector = metricConfig.getMetric(prometheusExporter);
+            String metricName = collector.getClass().getSimpleName();
 
-                        if (Boolean.TRUE.equals(enabled)) {
-                            if (isFolia() && !foliaSupported) {
-                                prometheusExporter.getLogger().warning("Metric " + metricName + " is not supported in Folia and will not be enabled");
-                                return;
-                            }
-                            metric.enable();
-                        }
+            try {
+                Boolean enabled = get(metricConfig);
 
-                        prometheusExporter.getLogger().fine("Metric " + metricName + " enabled: " + enabled);
-
-                        MetricRegistry.getInstance().register(metric);
-                    } catch (Exception e) {
-                        prometheusExporter.getLogger().warning("Failed to enable metric " + metricName + ": " + e.getMessage());
-                        prometheusExporter.getLogger().log(java.util.logging.Level.FINE, "Failed to enable metric " + metricName, e);
+                if (Boolean.TRUE.equals(enabled)) {
+                    api.registerMetric(collector);
+                    prometheusExporter.getLogger().fine("Metric " + metricName + " enabled: " + enabled);
                     }
-                });
+            } catch (Exception e) {
+                prometheusExporter.getLogger().warning("Failed to enable metric " + metricName + ": " + e.getMessage());
+                prometheusExporter.getLogger().log(java.util.logging.Level.FINE, "Failed to enable metric " + metricName, e);
+            }
+        });
     }
 
     public <T> T get(PluginConfig<T> config) {
@@ -105,6 +101,7 @@ public class PrometheusExporterConfig {
      * @return true if the server is running Folia
      * @see <a href="https://docs.papermc.io/paper/dev/folia-support">Folia Support</a>
      */
+/*  Пока (и возможно в принципе) не имеет смысла, поскольку Folia нет
     private static boolean isFolia() {
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
@@ -113,4 +110,7 @@ public class PrometheusExporterConfig {
             return false;
         }
     }
+
+*/
+
 }

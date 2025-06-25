@@ -2,22 +2,23 @@ package su.funtime.prometheusexporter.metrics;
 
 import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 
-public class CpuUsageProcess_100 extends Metric {
+public class CpuUsageProcess_100 extends MetricCollector {
 
-    private static final Gauge CPU_USAGE_PROCESS_100 = Gauge.build()
-            .name(prefix("cpu_usage_process_100"))
-            .help("CPU usage of process percentage")
-            .create();
 
     public CpuUsageProcess_100(Plugin plugin) {
-        super(plugin, CPU_USAGE_PROCESS_100);
+        super(plugin,
+                "cpu_usage_process_100",
+                "CPU usage of process percentage",
+                true);
     }
 
-    private double getCpuUsage() {
+    @Override
+    public double collect() {
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
             com.sun.management.OperatingSystemMXBean sunOsBean = (com.sun.management.OperatingSystemMXBean) osBean;
@@ -26,21 +27,4 @@ public class CpuUsageProcess_100 extends Metric {
             return 0.0;
         }
     }
-
-
-    @Override
-    protected void doCollect() {
-        CPU_USAGE_PROCESS_100.set(getCpuUsage());
-    }
-
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
-
-    @Override
-    public boolean isAsyncCapable() {
-        return true;
-    }
-
 }

@@ -1,37 +1,33 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
-public class PlayersOnlineTotal extends WorldMetric {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    private static final Gauge PLAYERS_ONLINE = Gauge.build()
-            .name(prefix("players_online_total"))
-            .help("Players currently online per world")
-            .labelNames("world")
-            .create();
+public class PlayersOnlineTotal extends MetricCollector {
 
     public PlayersOnlineTotal(Plugin plugin) {
-        super(plugin, PLAYERS_ONLINE);
+        super(plugin, "players_online_total", "Players currently online per world", true);
     }
 
     @Override
-    protected void clear() {
+    public List<String> getLabelNames() {
+        return List.of("world");
     }
 
     @Override
-    protected void collect(World world) {
-        PLAYERS_ONLINE.labels(world.getName()).set(world.getPlayers().size());
-    }
+    public Map<List<String>, Double> collectWithLabels() {
+        Map<List<String>, Double> map = new HashMap<>();
 
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
+        for (World world : Bukkit.getWorlds()) {
+            map.put(List.of(world.getName()), (double) world.getPlayers().size());
+        }
 
-    @Override
-    public boolean isAsyncCapable() {
-        return true;
+        return map;
     }
 }

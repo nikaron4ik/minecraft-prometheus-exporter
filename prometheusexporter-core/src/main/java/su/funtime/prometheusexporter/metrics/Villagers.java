@@ -1,10 +1,13 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Villager;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -20,37 +23,40 @@ import java.util.stream.Collectors;
  *     <li> Level ({@link Villager#getVillagerLevel()})
  * </ul>
  */
-public class Villagers extends WorldMetric {
-
-    private static final Gauge VILLAGERS = Gauge.build()
-            .name(prefix("villagers_total"))
-            .help("Villagers total count, labelled by world, type, profession, and level")
-            .labelNames("world", "type", "profession", "level")
-            .create();
+public class Villagers extends MetricCollector {
 
     public Villagers(Plugin plugin) {
-        super(plugin, VILLAGERS);
+        super(plugin, "villagers_total", "Villagers total count, labelled by world, type, profession, and level", false );
     }
 
     @Override
-    protected void clear() {
-        VILLAGERS.clear();
+    public List<String> getLabelNames() {
+        return List.of("world", "type", "profession", "level");
     }
 
     @Override
-    public void collect(World world) {
-        Map<VillagerGrouping, Long> mapVillagerGroupingToCount = world
-                .getEntitiesByClass(Villager.class).stream()
-                .collect(Collectors.groupingBy(VillagerGrouping::new, Collectors.counting()));
+    public Map<List<String>, Double> collectWithLabels() {
+        Map<List<String>, Double> map = new HashMap<>();
 
-        mapVillagerGroupingToCount.forEach((grouping, count) ->
-                VILLAGERS
-                        .labels(world.getName(),
-                                grouping.type.getKey().getKey(),
-                                grouping.profession.getKey().getKey(),
-                                Integer.toString(grouping.level))
-                        .set(count)
-        );
+        for (World world : Bukkit.getWorlds()) {
+            Map<VillagerGrouping, Long> mapVillagerGroupingToCount = world
+                    .getEntitiesByClass(Villager.class).stream()
+                    .collect(Collectors.groupingBy(VillagerGrouping::new, Collectors.counting()));
+
+            mapVillagerGroupingToCount.forEach((grouping, count) ->
+                    map.put(
+                            List.of(
+                                    world.getName(),
+                                    grouping.type.getKey().getKey(),
+                                    grouping.profession.getKey().getKey(),
+                                    Integer.toString(grouping.level)
+                            ),
+                            (double) count
+                    )
+            );
+        }
+
+        return map;
     }
 
     /**

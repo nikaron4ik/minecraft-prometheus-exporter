@@ -5,6 +5,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -33,11 +35,47 @@ public abstract class MetricCollector implements Supplier<Double> {
     private final boolean isAsyncCapable;
 
     /**
-     * Абстрактный метод, который реализуется для возвращения значения метрики.
+     * Метод вызывается при регистрации метрики.
+     */
+    public void onRegister() {} // P.s. (Для ревью) Возможно следует сделать абстрактным?
+
+    /**
+     * Вызывается, при снятии регистрации с метрики
+     */
+    public void onUnregister() {} // P.s. (Для ревью) Возможно следует сделать абстрактным?
+
+    /**
+     * Метод, который реализуется для возвращения значения метрики (без лейблов).
 
      * @return числовое значение метрики
+     * @throws UnsupportedOperationException если метод collect используется для получения значения метрики без лейблов
      */
-    public abstract double collect();
+    public double collect() {
+        throw new UnsupportedOperationException("Метрика с лейблами поддерживает только collectWithLabels()");
+    }
+
+    /**
+     * Метод, реализующий логику смотра значений метрик, имеющих лейблы
+     * Например, для метрики mc_entities_total есть лейбл type, в котором помечается тип моба,
+     * или world, где указывается мир моба
+     *
+     * @return мапу лейблов с соответствующим метрике с этими лейблами значением
+     *  Пример:
+     *  для метрики mc_entities_total с лейблами type="pig", world="world" будет значение 1251,
+     *  для метрики mc_entites_total с лейблами type="cow", world="world" будет значение 845
+     */
+    public Map<List<String>, Double> collectWithLabels() {
+        return Map.of(List.of(), collect());
+    }
+
+    /**
+     * Список лейблов метрики.
+     *
+     * Если возвращается пустой список, считается, что метрика лейблов не имеет.
+     */
+    public List<String> getLabelNames() {
+        return List.of();
+    }
 
     /**
      * Используется для вызова метода {@link #collect()}

@@ -1,24 +1,24 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 
-public class CpuUsageOS extends Metric {
-
-    private static final Gauge CPU_USAGE_OS = Gauge.build()
-            .name(prefix("cpu_usage_os"))
-            .help("CPU usage OS percentage (by number of cores")
-            .create();
+public class CpuUsageOS extends MetricCollector {
 
 
     public CpuUsageOS(Plugin plugin) {
-        super(plugin, CPU_USAGE_OS);
+        super(plugin,
+                "cpu_usage_os",
+                "CPU usage OS percentage (by number of cores)",
+                true
+        );
     }
 
-    private double getCpuUsage() {
+    @Override
+    public double collect() {
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
             com.sun.management.OperatingSystemMXBean sunOsBean = (com.sun.management.OperatingSystemMXBean) osBean;
@@ -31,20 +31,5 @@ public class CpuUsageOS extends Metric {
         } else {
             return 0.0;
         }
-    }
-
-    @Override
-    protected void doCollect() {
-        CPU_USAGE_OS.set(getCpuUsage());
-    }
-
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
-
-    @Override
-    public boolean isAsyncCapable() {
-        return true;
     }
 }

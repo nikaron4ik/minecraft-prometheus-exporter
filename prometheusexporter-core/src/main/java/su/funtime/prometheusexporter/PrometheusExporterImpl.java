@@ -27,16 +27,16 @@ public final class PrometheusExporterImpl extends JavaPlugin implements ProjectC
 
     @Override
     public void onEnable() {
+        registerMetrics = new RegisterMetricsImpl();
+
+        PrometheusApi.controller = this;
+
         this.config.loadDefaultsAndSave();
         this.config.enableConfiguredMetrics();
         HealthChecks healthChecks = ConcurrentHealthChecks.create();
         this.getServer().getServicesManager().register(HealthChecks.class, healthChecks, this, ServicePriority.Normal);
         Objects.requireNonNull(healthChecks);
         this.startMetricsServer(healthChecks);
-
-        registerMetrics = new RegisterMetricsImpl();
-
-        PrometheusApi.controller = this;
     }
 
     private void startMetricsServer(HealthChecks healthChecks) {

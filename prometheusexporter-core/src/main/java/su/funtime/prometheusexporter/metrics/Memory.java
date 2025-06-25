@@ -1,37 +1,25 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
-public class Memory extends Metric {
-
-    private static final Gauge MEMORY_USED_PERCENT = Gauge.build()
-            .name(prefix("jvm_memory"))
-            .help("JVM used memory in percentage")
-            .create();
+public class Memory extends MetricCollector {
 
     public Memory(Plugin plugin) {
-        super(plugin, MEMORY_USED_PERCENT);
+        super(plugin,
+                "jvm_memory",
+                "JVM used memory in percentage",
+                true);
     }
 
     @Override
-    public void doCollect() {
+    public double collect() {
         long maxMemory = Runtime.getRuntime().maxMemory();
         long totalMemory = Runtime.getRuntime().totalMemory();
         long freeMemory = Runtime.getRuntime().freeMemory();
         long usedMemory = totalMemory - freeMemory;
 
-        double usedMemoryPercent = ((double) usedMemory / maxMemory) * 100.0;
-        MEMORY_USED_PERCENT.set(usedMemoryPercent);
+        return ((double) usedMemory / maxMemory) * 100.0;
     }
 
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
-
-    @Override
-    public boolean isAsyncCapable() {
-        return true;
-    }
 }

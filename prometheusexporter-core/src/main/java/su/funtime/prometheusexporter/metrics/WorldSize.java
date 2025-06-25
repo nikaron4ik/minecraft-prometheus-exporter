@@ -1,50 +1,44 @@
 package su.funtime.prometheusexporter.metrics;
 
+import org.bukkit.Bukkit;
+import su.funtime.prometheusexporter.api.MetricCollector;
 import su.funtime.prometheusexporter.utils.PathFileSize;
-import io.prometheus.client.Gauge;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
-public class WorldSize extends WorldMetric {
+public class WorldSize extends MetricCollector {
 
     private final Logger log;
-    private static final Gauge WORLD_SIZE = Gauge.build()
-            .name(prefix("world_size"))
-            .help("World size in bytes")
-            .labelNames("world")
-            .create();
 
     public WorldSize(Plugin plugin) {
-        super(plugin, WORLD_SIZE);
+        super(plugin, "world_size", "World size in bytes", true);
         this.log = plugin.getLogger();
     }
 
-    @Override
-    protected void clear() {
-        WORLD_SIZE.clear();
+    public List<String> getLabelNames() {
+        return List.of("world");
     }
 
     @Override
-    public void collect(World world) {
-        try {
-            PathFileSize pathUtils = new PathFileSize(world.getWorldFolder().toPath());
-            long size = pathUtils.getSize();
-            String worldName = world.getName();
-            WORLD_SIZE.labels(worldName).set(size);
-        } catch (Throwable t) {
-            log.throwing(this.getClass().getSimpleName(), "collect", t);
+    public Map<List<String>, Double> collectWithLabels() {
+        Map<List<String>, Double> map = new HashMap<>();
+
+        for (World world : Bukkit.getWorlds()) {
+            try {
+                PathFileSize pathUtils = new PathFileSize(world.getWorldFolder().toPath());
+                long size = pathUtils.getSize();
+                map.put(List.of(world.getName()), (double) size);
+            } catch (Throwable t) {
+                log.throwing(this.getClass().getSimpleName(), "collectWithLabels", t);
+            }
         }
+
+        return map;
     }
 
-    @Override
-    protected boolean isAsyncCapable() {
-        return true;
-    }
-
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
-    }
 }

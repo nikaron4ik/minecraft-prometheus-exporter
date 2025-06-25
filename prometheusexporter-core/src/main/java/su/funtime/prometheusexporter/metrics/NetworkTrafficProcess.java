@@ -1,24 +1,36 @@
 package su.funtime.prometheusexporter.metrics;
 
-import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
+import su.funtime.prometheusexporter.api.MetricCollector;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class NetworkTrafficProcess extends Metric {
-
-    private static final Gauge NETWORK_BYTES = Gauge.build()
-            .name(prefix("network_bytes"))
-            .help("Network traffic in bytes")
-            .labelNames("type")
-            .create();
-
+public class NetworkTrafficProcess extends MetricCollector {
     private static final String interfaceName = "eth0"; // имя сетевого интерфейса
 
     public NetworkTrafficProcess(Plugin plugin) {
-        super(plugin, NETWORK_BYTES);
+        super(plugin, "network_bytes", "Network traffic in bytes", true);
+    }
+
+    @Override
+    public List<String> getLabelNames() {
+        return List.of("type");
+    }
+
+    @Override
+    public Map<List<String>, Double> collectWithLabels() {
+        Map<List<String>, Double> map = new HashMap<>();
+        long[] traffic = getNetworkTrafficFromProcess();
+
+        map.put(List.of("received"), (double) traffic[0]);
+        map.put(List.of("sent"), (double) traffic[1]);
+
+        return map;
     }
 
     private long[] getNetworkTrafficFromProcess() {
@@ -45,21 +57,6 @@ public class NetworkTrafficProcess extends Metric {
             getPlugin().getLogger().warning("Ошибка при парсинге /proc/net/dev: " + e.getMessage());
         }
         return traffic;
-    }
-
-    @Override
-    protected void doCollect() {
-        long[] traffic = getNetworkTrafficFromProcess();
-        long receivedBytes = traffic[0];
-        long sentBytes = traffic[1];
-
-        NETWORK_BYTES.labels("received").set(receivedBytes);
-        NETWORK_BYTES.labels("sent").set(sentBytes);
-    }
-
-    @Override
-    public boolean isFoliaCapable() {
-        return true;
     }
 
     @Override
