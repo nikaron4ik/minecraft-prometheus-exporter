@@ -2,6 +2,7 @@ package su.funtime.prometheusexporter.metrics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import su.funtime.prometheusexporter.api.MetricCollector;
 
@@ -25,7 +26,9 @@ public class PlayersOnlineTotal extends MetricCollector {
         Map<List<String>, Double> map = new HashMap<>();
 
         for (World world : Bukkit.getWorlds()) {
-            map.put(List.of(world.getName()), (double) world.getPlayers().size());
+            List<Player> players = world.getPlayers();
+            players.removeIf(player -> player.hasMetadata("NPC"));
+            map.put(List.of(world.getName()), (double) players.size());
         }
 
         return map;
