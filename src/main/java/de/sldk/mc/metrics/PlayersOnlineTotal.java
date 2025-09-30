@@ -2,7 +2,10 @@ package de.sldk.mc.metrics;
 
 import io.prometheus.client.Gauge;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 public class PlayersOnlineTotal extends WorldMetric {
 
@@ -22,7 +25,9 @@ public class PlayersOnlineTotal extends WorldMetric {
 
     @Override
     protected void collect(World world) {
-        PLAYERS_ONLINE.labels(world.getName()).set(world.getPlayers().size());
+        List<Player> players = world.getPlayers();
+        players.removeIf(player -> player.hasMetadata("NPC"));
+        PLAYERS_ONLINE.labels(world.getName()).set(players.size());
     }
 
     @Override
